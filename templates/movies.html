@@ -1,0 +1,12 @@
+<html>
+    <body>
+     <h1>Theaters</h1>
+     {% for city in movies %}
+         <h2>{{city["sehir"]}}</h2>
+         {% for theater in city["theaters"] %}
+            <h3>    {{theater["theater_name"]}}</h3>
+            </div>
+         {% endfor %}
+     {% endfor %}
+    </body>
+</html>
