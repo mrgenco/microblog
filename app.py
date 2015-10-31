@@ -21,18 +21,19 @@ def login_required(f):
             return redirect(url_for('login'))
     return wrap
 
-
 @app.route('/welcome')
 def welcome():
 	return render_template('welcome.html')
 
 #home page route
 @app.route('/')
+@app.route('/home')
 @login_required
 def home():
 	g.db = connect_db()
 	cur = g.db.execute('select * from posts')
 	posts = [dict(title=row[0], description=row[1]) for row in cur.fetchall()]
+	print posts
 	g.db.close()
 	return render_template('index.html', posts=posts)  # render a template
 
@@ -46,7 +47,9 @@ def login():
 		else:
 			session['logged_in'] = True
 			flash("You were just logged in!")
-			return redirect(url_for('home'))	
+			return redirect(url_for('home'))
+	elif "logged_in" in session:
+		return redirect(url_for('home'))	
 	return render_template('login.html', error = error)
 
 
