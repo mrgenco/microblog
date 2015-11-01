@@ -25,19 +25,25 @@ def login_required(f):
 def welcome():
 	return render_template('welcome.html')
 
-#home page route
+#HOME
 @app.route('/')
 @app.route('/home')
 @login_required
 def home():
-	g.db = connect_db()
-	cur = g.db.execute('select * from posts')
-	posts = [dict(title=row[0], description=row[1]) for row in cur.fetchall()]
-	print posts
-	g.db.close()
+	posts = []
+	try:
+		g.db = connect_db()
+		cur = g.db.execute('select * from posts')
+		posts = [dict(title=row[0], description=row[1]) for row in cur.fetchall()]
+		print posts
+		g.db.close()
+	
+	except sqlite3.OperationalError:
+		flash("Database not found!")
+
 	return render_template('index.html', posts=posts)  # render a template
 
-
+#LOGIN
 @app.route('/login', methods=['GET','POST'])
 def login():
 	error = None
@@ -53,6 +59,7 @@ def login():
 	return render_template('login.html', error = error)
 
 
+#LOGOUT
 @app.route('/logout')
 @login_required
 def logout():
