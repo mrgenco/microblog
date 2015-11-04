@@ -2,12 +2,23 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from functools import wraps
 import requests
 import json
+from flask.ext.sqlalchemy import SQLAlchemy
 import sqlite3
 
 app = Flask(__name__)
 
 app.secret_key = "my precious"
-app.db = "sample.db"
+# app.db = "sample.db"
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
+
+# create the sqlalchemy object
+db = SQLAlchemy(app)
+
+# import db schema
+from models import *
+
 
 
 # login required decorator
@@ -30,18 +41,21 @@ def welcome():
 @app.route('/home')
 @login_required
 def home():
-	posts = []
-	try:
-		g.db = connect_db()
-		cur = g.db.execute('select * from posts')
-		posts = [dict(title=row[0], description=row[1]) for row in cur.fetchall()]
-		print posts
-		g.db.close()
+#	posts = []
+#	try:
+#		g.db = connect_db()
+#		cur = g.db.execute('select * from posts')
+#		posts = [dict(title=row[0], description=row[1]) for row in cur.fetchall()]
+#		print posts
+#		g.db.close()
 	
-	except sqlite3.OperationalError:
-		flash("Database not found!")
+#	except sqlite3.OperationalError:
+#		flash("Database not found!")
 
-	return render_template('index.html', posts=posts)  # render a template
+	# return "Hello, World!"  # return a string
+	posts = db.session.query(BlogPost).all()
+    # render a template
+	return render_template('index.html', posts=posts) 
 
 #LOGIN
 @app.route('/login', methods=['GET','POST'])
